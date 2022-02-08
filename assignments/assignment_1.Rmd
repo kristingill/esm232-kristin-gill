@@ -7,6 +7,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(devtools)
+library(purrr)
 ```
 
 I am taking this course because I would like to gain more experience with coding. I would like to be able to get a job where I can use R, Python, and GIS. I hope to gain more experience with loops and functions. 
