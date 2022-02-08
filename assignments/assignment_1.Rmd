@@ -1,0 +1,14 @@
+---
+title: "Assignment 1"
+author: "Kristin Gill"
+date: "2/8/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I am taking this course because I would like to gain more experience with coding. I would like to be able to get a job where I can use R, Python, and GIS. I hope to gain more experience with loops and functions. 
+
+I enjoyed taking Allison's Data Analysis and Advanced Data Analysis classes. Before Bren, I took some Coursera intro to Python and data structures classes. I had also used Python to loop over .csv files to clean and merge data. Over the summer, I created a ShinyApp to visualize marine mammal stranding data for my internship. 
