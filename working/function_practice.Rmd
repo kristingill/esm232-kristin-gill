@@ -1,0 +1,33 @@
+---
+title: "assignment_3"
+author: "Kristin Gill"
+date: "2/14/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+```
+
+```{r}
+power <- power_car(mass = 31752, velocity = c(30, 22.22, 33.33, 11.11, 1.39), area = 16)
+
+power_lighter <- power_car(mass = 10000, velocity = c(30, 22.22, 33.33, 11.11, 1.39), area = 16)
+
+velocity <- c(30, 22.22, 33.33, 11.11, 1.39)
+
+power_velocity <- data.frame(power, power_lighter, velocity)
+
+ggplot() +
+  geom_line(data = power_velocity, aes(x = velocity, y = power), color = "red", lwd = 0.75) +
+  geom_line(data = power_velocity, aes(x = velocity, y = power_lighter), color = "blue", lwd = 0.75) +
+  theme_minimal() +
+  labs(x = "Velocity (m/s)", y = "Power (W)") +
+  scale_y_continuous(labels = scales::comma)
+```
+
+
+
+

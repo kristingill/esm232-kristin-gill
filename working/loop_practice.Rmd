@@ -1,0 +1,40 @@
+---
+title: "loop_practice"
+author: "Kristin Gill"
+date: "2/16/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+nsample = 10
+
+fertilizer = rnorm(mean=5, sd=0.5, n=nsample)
+
+TP = 20
+
+fertilizer_application <- data.frame(fertilizer = fertilizer, yield = NA)
+```
+
+```{r}
+for (i in 1:nrow(fertilizer_application)) {
+  fertilizer_application$yield[i] = (1.8*(fertilizer_application$fertilizer[i]^2) - (0.5*fertilizer_application$fertilizer[i]) + (0.3*TP))
+}
+```
+
+```{r}
+fertilizer_function = function(fertilizer, TP) {
+  if (fertilizer == fertilizer_application$fertilizer)
+  print("yay")
+  
+  result = 1.8 * (fertilizer^2) - 0.5*fertilizer + 0.3*TP
+  return(result)
+}
+
+fertilizer_function(fertilizer = fertilizer, TP = TP)
+```
+

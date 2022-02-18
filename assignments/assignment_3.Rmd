@@ -1,0 +1,176 @@
+---
+title: "Assignment 3"
+author: "Kristin Gill"
+date: "2/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(purrr)
+library(ggpubr)
+library(here)
+```
+
+```{r}
+# data frame with possible cars, including name, mass, and area
+possible_cars <- data.frame(name = c("A","B","C","D"),mass=c(10000,65000,38000, 5000), area = c(22,30,22,10))
+
+# speed of 100 km/hr
+speed_base <- 100 * 0.28
+
+source(here("R", "autopower.R"))
+
+# add power to dataframe, using function
+possible_cars_power <- possible_cars %>% 
+  mutate(power = autopower(V = speed_base, A = area, m = mass))
+
+# plot it
+ggplot(possible_cars_power, aes(x = mass, y = power, fill = as.factor(area))) +
+  geom_col() +
+  labs(y="Power (W)", x="Mass (kg)", fill="Area (m2)") +
+  theme_minimal()
+```
+
+
+# Building a highway
+
+# First lets do it 'by hand'
+```{r}
+# use sample to generate a distribution of speeds
+
+# number of samples
+nsample <- 200
+
+#unit conversion
+mean_speed <- log(100*0.277)
+
+# assume a log normal distribution of speeds with mean 100km/hr, and standard deviation that is 10% of the mean
+speeds = rlnorm(mean=mean_speed, sd=0.1*mean_speed, nsample)
+summary(speeds)
+
+plot(density(speeds), ylab="Distribution of Speeds in (m/s)")
+
+# first lets to it by hand for the first car - the first row in our possible cars matrix
+possible_cars[1,]
+
+powerA <- autopower(V=speeds, A = possible_cars$area[1], m=possible_cars$mass[1])
+summary(powerA)
+
+powerB <- autopower(V=speeds, A = possible_cars$area[2], m=possible_cars$mass[2])
+summary(powerB)
+
+powerC <- autopower(V=speeds, A = possible_cars$area[3], m=possible_cars$mass[3])
+summary(powerC)
+
+powerD <- autopower(V=speeds, A = possible_cars$area[4], m=possible_cars$mass[4])
+summary(powerD)
+
+
+# we could put this together
+powerall1 <- cbind.data.frame(powerA, powerB, powerC, powerD)
+colnames(powerall1) <- possible_cars$name
+
+powerallr1 <- powerall1 %>% pivot_longer(cols=everything(), names_to="car", values_to="power")
+head(powerallr1)
+
+
+method1_plot <- ggplot(powerallr1, aes(car,power, fill=car)) +
+  geom_boxplot()+
+  ggtitle("By Hand") +
+  theme_minimal()
+
+method1_plot
+```
+
+
+# Second using R built in tools
+```{r}
+nsample <- 200
+mean_speed <- log(100*0.277)
+
+speeds <- rlnorm(mean=mean_speed, sd=0.1*mean_speed, nsample)
+summary(speeds)
+
+plot(density(speeds), ylab="Distribution of Speeds in (m/s)")
+
+# pmap
+powerall2 <- pmap(list(A = possible_cars$area, m = possible_cars$mass), autopower, V=speeds)
+
+# data frame
+powerall2 <- as.data.frame(powerall2, col.names=possible_cars$name)
+
+#mapply
+powerall2b <- mapply(FUN=autopower, A = possible_cars$area, m=possible_cars$mass, MoreArgs <- list(V=speeds)  )
+
+# we can add column names
+colnames(powerall2b) <- possible_cars$name
+
+powerallr2 <- powerall2 %>% pivot_longer(cols=everything(), names_to="car", values_to="power")
+
+method2_plot <- ggplot(powerallr2, aes(car,power, fill=car)) +
+  geom_boxplot() +
+  ggtitle("pmap") +
+  theme_minimal()
+
+method2_plot
+
+# put plots side by side
+# to confirm that they look similar
+ggarrange(method1_plot, method2_plot)
+
+# compare values
+head(powerallr2)
+head(powerallr1)
+
+# not exactly the same - why? recall that we sample speeds!
+
+# map runs the function (here - mean), over each column 
+# they are close but still not exact, so statistics such as means and quantiles are # similar, and relative difference between cars is the same
+
+powerall1 %>% map(mean)
+powerall2 %>% map(mean)
+
+# upper 90% quantile
+powerall1 %>% map(quantile, probs=0.9)
+powerall2 %>% map(quantile, probs=0.9)
+
+```
+
+
+# Third - classic looping *for*
+```{r}
+nsample = 200
+mean_speed = log(100*0.277)
+
+speeds = rlnorm(mean=mean_speed, sd=0.1*mean_speed, nsample)
+summary(speeds)
+
+plot(density(speeds), ylab="Distribution of Speeds in (m/s)")
+
+powerall3 <- as.data.frame(matrix(nrow=length(speeds), ncol=nrow(possible_cars)))
+
+nrow(possible_cars)
+
+for (i in 1:nrow(possible_cars)) {
+  powerall3[,i] = autopower(A=possible_cars$area[i], m=possible_cars$mass[i], V=speeds)
+}
+
+colnames(powerall3)=possible_cars$name
+
+powerallr3 <- powerall3 %>% 
+  pivot_longer(cols=everything(), names_to="car", values_to="power")
+
+# quick visualization
+method3_plot <- ggplot(powerallr3, aes(car,power, fill=car)) +
+  geom_boxplot() +
+  ggtitle("For Loop")
+
+ggarrange(method1_plot, method2_plot, method3_plot, nrow=3)
+
+powerall1 %>% map(mean)
+powerall2 %>% map(mean)
+powerall3 %>% map(mean)
+```
+
