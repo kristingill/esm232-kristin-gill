@@ -1,0 +1,11 @@
+---
+title: "Assignment 4"
+author: "Kristin Gill and Sydney Rilum"
+date: "2/23/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+

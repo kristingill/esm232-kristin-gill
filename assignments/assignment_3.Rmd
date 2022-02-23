@@ -169,8 +169,16 @@ method3_plot <- ggplot(powerallr3, aes(car,power, fill=car)) +
 
 ggarrange(method1_plot, method2_plot, method3_plot, nrow=3)
 
-powerall1 %>% map(mean)
-powerall2 %>% map(mean)
-powerall3 %>% map(mean)
+powerall1 %>% 
+  select(D) %>% 
+  map(mean)
+
+powerall2 %>%
+  select(D) %>% 
+  map(mean)
+
+powerall3 %>% 
+  select(D) %>% 
+  map(mean)
 ```
 
