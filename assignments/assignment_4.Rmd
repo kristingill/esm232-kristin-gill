@@ -16,27 +16,35 @@ library(ggpubr)
 ```{r}
 source(here("R", "exponential_growth.R"))
 
-exponential_growth(init_pop = 100, r = 10, t = 5)
+r <- seq(from=0.1, to=1, by=0.1)
 
-r <- seq(from= 0, to = 1, by=0.01)
+t <- seq(from=1, to=30, by=1)
 
-t <- seq(from= 1, to=1000, by=5)
+population_data <- data.frame(matrix(ncol= length(r), nrow=length(t)))
 
-population_data <- data.frame(matrix(nrow= length(r), ncol=length(t)))
+rownames(population_data) <- t
 
-colnames(population_data) <- t
+colnames(population_data) <- r
 
-rownames(population_data) <- r
+initial_population <- 100
 
-for(i in 1:length(r)) {
-  for(j in 1:length(t)) {
-    population_data[i,j] = exponential_growth(init_pop=100, r = r[i], t=t[j])
+for(i in 1:length(t)) {
+  for(j in 1:length(r)) {
+    population_data[i,j] = exponential_growth(init_pop= initial_population, r = r[j], t=t[i])
   }
 }
 
-population_data$r = rownames(population_data)
-
 population_data <- population_data %>% 
-  pivot_longer(!r, names_to=c("time", "growth_rate"), values_to= "population_size")
+  mutate(time = rownames(population_data)) %>% 
+  pivot_longer(!time, names_to="r", values_to= "population_size") %>% 
+  #filter(r == "0.1") %>% 
+  mutate(time = as.numeric(time))
+
+ggplot(data = population_data, aes(x = time,
+                                   y = population_size)) +
+  facet_wrap(~r, scales = "free") +
+  geom_col()+
+  theme_minimal() +
+  labs(x = "Time (Days)", y = "Population Size")
 ```
 
