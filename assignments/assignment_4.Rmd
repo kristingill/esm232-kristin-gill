@@ -1,5 +1,5 @@
 ---
-title: "Assignment 4"
+title: "Assignment 4: Looping"
 author: "Kristin Gill and Sydney Rilum"
 date: "2/23/2022"
 output: html_document
@@ -14,37 +14,57 @@ library(ggpubr)
 ```
 
 ```{r}
+# load in exponential growth function
 source(here("R", "exponential_growth.R"))
 
+# generate data for function inputs
 r <- seq(from=0.1, to=1, by=0.1)
-
 t <- seq(from=1, to=30, by=1)
 
-population_data <- data.frame(matrix(ncol= length(r), nrow=length(t)))
+# create a data frame to store values
+population_data <- data.frame(matrix(ncol = length(r), nrow = length(t)))
 
 rownames(population_data) <- t
-
 colnames(population_data) <- r
 
 initial_population <- 100
 
+# use nested "for loop" to run exponential growth function for various growth rates over thirty days
 for(i in 1:length(t)) {
   for(j in 1:length(r)) {
     population_data[i,j] = exponential_growth(init_pop= initial_population, r = r[j], t=t[i])
   }
 }
 
+# rearrange data frame to plot results
 population_data <- population_data %>% 
   mutate(time = rownames(population_data)) %>% 
   pivot_longer(!time, names_to="r", values_to= "population_size") %>% 
   #filter(r == "0.1") %>% 
   mutate(time = as.numeric(time))
 
+# graph result
 ggplot(data = population_data, aes(x = time,
                                    y = population_size)) +
   facet_wrap(~r, scales = "free") +
   geom_col()+
   theme_minimal() +
-  labs(x = "Time (Days)", y = "Population Size")
+  labs(x = "Time (Days)", 
+       y = "Population Size",
+       title = "Exponential Population Growth for Various Growth Rates")
 ```
+
+```{r}
+## alternative looping
+
+# generate data for function inputs
+r <- seq(from=0.1, to=1, by=0.1)
+t <- seq(from=1, to=30, by=1)
+initial_population <- 100
+
+# use `pmap()` from the `purr` package to run exponential growth function for various growth rates over thirty days
+population_data_2 = pmap(list(r), exponential_growth, t = t, init_pop = initial_population)
+
+```
+
 
