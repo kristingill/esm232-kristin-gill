@@ -60,11 +60,28 @@ ggplot(data = population_data, aes(x = time,
 # generate data for function inputs
 r <- seq(from=0.1, to=1, by=0.1)
 t <- seq(from=1, to=30, by=1)
+
 initial_population <- 100
 
 # use `pmap()` from the `purr` package to run exponential growth function for various growth rates over thirty days
-population_data_2 = pmap(list(r), exponential_growth, t = t, init_pop = initial_population)
 
+population_data_2 <- pmap(list(r), exponential_growth, init_pop = initial_population, r = r, t = t)
+
+population_data_2 <- as.data.frame(population_data_2, col.names=r) %>% 
+  mutate(time = t) %>% 
+  pivot_longer(!time, names_to="r", values_to= "population_size") %>% 
+  mutate(r = as.character(r)) %>% 
+  separate(r, into = c("X", "r"), sep = "X") %>% 
+  select(time, r, population_size)
+
+ggplot(data = population_data_2, aes(x = time,
+                                   y = population_size)) +
+  facet_wrap(~r, scales = "free") +
+  geom_col()+
+  theme_minimal() +
+  labs(x = "Time (Days)", 
+       y = "Population Size",
+       title = "Exponential Population Growth for Various Growth Rates")
 ```
 
 
