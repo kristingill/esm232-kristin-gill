@@ -1,0 +1,24 @@
+---
+title: "Fish"
+author: "Kristin Gill"
+date: "2/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+```
+
+```{r}
+fish <- read.table(here("data", "fish.txt")) %>% 
+  rename(fish = V1) %>% 
+  slice(2:301)
+
+#fish <- as.factor(fish$fish)
+
+source(here("R", "fish_function.R"))
+
+fish_function(fish)
+```
