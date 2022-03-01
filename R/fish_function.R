@@ -11,9 +11,14 @@
 #' @return rarest, the rarest fish
 
 fish_function = function(fish) {
+  
   total = count(fish)
+  
   fish <- as.factor(fish$fish)
+  
   most_common = names(which.max(summary(fish)))
+  
   rarest = names(which.min(summary(fish)))
-  return(c(total, most_common, rarest))
+  
+  return(c(total = total, most_common = most_common, rarest = rarest))
 }
