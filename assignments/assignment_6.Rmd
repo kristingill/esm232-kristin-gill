@@ -1,0 +1,54 @@
+---
+title: "assignment_6"
+author: "Kristin Gill"
+date: "3/2/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+```
+
+```{r}
+source(here("R", "temp_risk.R"))
+
+temperatures <- read.table(here("data", "tmax.txt")) %>% 
+  row_to_names(1) %>% 
+  mutate(tmax = as.numeric(tmax)) %>% 
+  mutate(date = as_date(date))
+
+temp <- temperatures$tmax
+
+date <- temperatures$date
+
+trees <- 10
+
+buildings <- 400
+
+income <- 50000
+
+consecutive_days <- 3
+
+risk <- temp_risk(temp = temp, consecutive_days = consecutive_days, temp_threshold = 30, income = income, trees = trees, buildings = buildings)
+```
+
+```{r}
+ggplot(data = risk, aes(x = cons_days,
+                        y = risk_value,
+                        color = risk_level)) +
+  geom_line(lwd = 1) +
+  theme_minimal()
+```
+
+
+```{r}
+ggplot(data = risk, aes(x = mean_temp, 
+                        y = risk_value)) +
+  geom_line() +
+  theme_minimal()
+```
+
