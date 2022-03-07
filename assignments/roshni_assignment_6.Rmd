@@ -1,0 +1,57 @@
+---
+title: "roshni's code"
+author: "Kristin Gill"
+date: "3/7/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+title: "Assignment 6"
+author: "Roshni Katrak-Adefowora"
+date: "3/2/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(stringi)
+
+source("../R/temp_risk_roshni.R")
+```
+
+```{r}
+#read in temperature data
+tmax <- read_delim(here("data", "tmax.txt"))
+
+#generate age, occupation, and income vectors
+set.seed(2)
+age <- sample(c("child", "adult", "elder"), 7920, replace = TRUE)
+occupation <- sample(c("outdoor", "indoor", "combination"), 7920, replace = TRUE)
+income <- sample(c("high", "medium", "low"), 7920, replace = TRUE)
+
+#merge vectors into data frame
+population_risk <- data.frame(occupation, age, income, tmax$tmax) %>% 
+  rename(temp_max = tmax.tmax)
+
+#remove occupation from child category
+ population_risk <- population_risk %>%
+   mutate(occupation = ifelse(age == "child", "none", occupation))
+ 
+ #add risk category
+ population_risk$risk = temp_risk(temperature = population_risk$temp_max,
+          occupation = population_risk$occupation,
+          age = population_risk$age,
+          income = population_risk$income)
+ 
+ #return lists of risk and number of extremes
+ risk <- temp_risk(temperature = population_risk$temp_max,
+          occupation = population_risk$occupation,
+          age = population_risk$age,
+          income = population_risk$income)
+```
