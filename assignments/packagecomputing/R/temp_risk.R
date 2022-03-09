@@ -3,13 +3,17 @@
 #' compute temperature risk for urban dwellers
 #' @param temp (C) (at least 5 days)
 #' @param temp_threshold (C) (default 30)
-#' @param trees, number of trees in the area
-#' @param buildings, number of buildings in the area
-#' @param consecutive_days, length of the heat event
-#' @param income, yearly income of the individual
+#' @param trees number of trees in the area
+#' @param buildings number of buildings in the area
+#' @param consecutive_days length of the heat event
+#' @param income yearly income of the individual
 #' @return risk (high, med, low)
 
 temp_risk = function(temp, consecutive_days, temp_threshold = 30, trees, income, buildings) {
+
+  usethis::use_package('glue')
+
+  use_tidy_dependencies()
 
   # create empty lists
   temp_over <- list()
